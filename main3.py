@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import Ecualizacion_Uniforme as eu
 import os
+import tkinter.font as font
 
 """Asegurarse de tener las librerias descargadas para su uso
     de no ser asi ejecutar
@@ -33,25 +34,27 @@ class Editor:
         root.title("Aplicación de Procesamiento de Imágenes")
 
         # Crear el marco principal de la ventana
-        button_frame = tk.Frame(root, bg="#d9d9d9", relief="groove", borderwidth=2)
+        button_frame = tk.Frame(root, bg="#516680", relief="groove", borderwidth=2)
         button_frame.pack(side=tk.LEFT, padx=15, pady=15, fill="y")
 
         # Crear un frame para las imágenes
-        image_frame = tk.Frame(root, bg="#e6e6e6", relief="ridge", borderwidth=2)
+        image_frame = tk.Frame(root, bg="#516680", relief="ridge", borderwidth=2)
         image_frame.pack(anchor='center', padx=15, pady=15, fill="both", expand=True)
 
         # -----------------------------
         # Sección de Etiquetas de Imagen
         # -----------------------------
         
-        root.configure(bg="#000332")
-        image_subframe1 = tk.Frame(image_frame, width=300, height=300, bg="#ffffff", relief="groove", borderwidth=2)
+        f = font.Font(size=35)
+
+        root.configure(bg="#0D3054")
+        image_subframe1 = tk.Frame(image_frame, width=300, height=300, bg="#BCD5FF", relief="groove", borderwidth=2)
         image_subframe1.grid(row=0, column=0, padx=15, pady=15, sticky="NW")
 
-        image_subframe2 = tk.Frame(image_frame, width=300, height=300, bg="#ffffff", relief="groove", borderwidth=2)
+        image_subframe2 = tk.Frame(image_frame, width=300, height=300, bg="#BCD5FF", relief="groove", borderwidth=2)
         image_subframe2.grid(row=1, column=0, padx=15, pady=15, sticky="SW")
 
-        image_subframe3 = tk.Frame(image_frame, width=300, height=600, bg="#ffffff", relief="groove", borderwidth=2)
+        image_subframe3 = tk.Frame(image_frame, width=300, height=600, bg="#BCD5FF", relief="groove", borderwidth=2)
         image_subframe3.grid(row=0, column=1, rowspan=2, padx=15, pady=15, sticky="E")
 
         # Etiquetas de texto e imagen con fuente y colores mejorados
@@ -81,13 +84,15 @@ class Editor:
         # -----------------------------
         # Sección de Carga de Imágenes
         # -----------------------------
+        
 
-        carga_frame = tk.LabelFrame(button_frame, text="Carga de Imágenes", padx=10, pady=10)
+        carga_frame = tk.LabelFrame(button_frame, text="Carga de Imágenes", padx=10, pady=10,bg="#BECACE",fg="#000000")
         carga_frame.grid(row=0, column=0, sticky="ew", pady=5)
-        self.toggle_carga_button = tk.Button(carga_frame, text="Mostrar/Ocultar Carga de Imágenes", command=self.toggle_carga)
+        self.toggle_carga_button = tk.Button(carga_frame, text="Mostrar/Ocultar Carga de Imágenes", command=self.toggle_carga,bg="#BBBFBF",fg="#000000")
+        self.toggle_carga_button['font'] = f = font.Font(size=10)
         self.toggle_carga_button.grid(row=0, column=0, pady=5, sticky="ew")
         # Marco para la carga de imágenes
-        self.carga_oculta_frame = tk.Frame(carga_frame)
+        self.carga_oculta_frame = tk.Frame(carga_frame,bg="#BECACE")
         self.load_button = tk.Button(self.carga_oculta_frame, text="Cargar Primera Imagen", command=self.cargar_imagen)
         self.load_button.grid(row=0, column=0, pady=5, sticky="ew")
         self.load_button2 = tk.Button(self.carga_oculta_frame, text="Cargar Segunda Imagen", command=self.cargar_imagen2)
@@ -98,52 +103,56 @@ class Editor:
         # Sección de Operaciones de Imagen
         # -----------------------------
 
-        self.operaciones_frame = tk.LabelFrame(button_frame, text="Operaciones", padx=10, pady=10)
+        self.operaciones_frame = tk.LabelFrame(button_frame, text="Operaciones", padx=10, pady=10,bg="#BECACE",fg="#000000")
         self.operaciones_frame.grid(row=1, column=0, sticky="ew", pady=5)
-        self.toggle_operaciones_button = tk.Button(self.operaciones_frame, text="Mostrar/Ocultar Operaciones", command=self.toggle_operaciones)
+        self.toggle_operaciones_button = tk.Button(self.operaciones_frame, text="Mostrar/Ocultar Operaciones", command=self.toggle_operaciones,bg="#BBBFBF",fg="#000000")
+        self.toggle_operaciones_button['font'] = f = font.Font(size=10)
         self.toggle_operaciones_button.grid(row=0, column=0, pady=5, sticky="ew")
         # Marco para las operaciones ocultas
-        self.operaciones_ocultas_frame = tk.Frame(self.operaciones_frame)
+        self.operaciones_ocultas_frame = tk.Frame(self.operaciones_frame,bg="#BECACE")
 
 
-        self.expansion_button = tk.Button(self.operaciones_ocultas_frame, text="Aplicar Expansión", command=self.aplicar_expansion)
-        self.expansion_button.grid(row=0, column=0, pady=5, sticky="ew")
+        
         self.label_expancion = tk.Label(self.operaciones_ocultas_frame, text="Valores MAX,MIN EXPANCION(Ejemplo:255,0):")
-        self.label_expancion.grid(row=1, column=0, pady=5, sticky="w")
+        self.label_expancion.grid(row=0, column=0, pady=5, sticky="w")
         self.entrada_expancion = tk.Entry(self.operaciones_ocultas_frame)
-        self.entrada_expancion.grid(row=2, column=0, pady=5, sticky="ew")
+        self.entrada_expancion.grid(row=1, column=0, pady=5, sticky="ew")
+        self.expansion_button = tk.Button(self.operaciones_ocultas_frame, text="Aplicar Expansión", command=self.aplicar_expansion)
+        self.expansion_button.grid(row=2, column=0, pady=5, sticky="ew")
 
 
-        self.contraction_button = tk.Button(self.operaciones_ocultas_frame, text="Aplicar Contracción", command=self.aplicar_contraccion)
-        self.contraction_button.grid(row=3, column=0, pady=5, sticky="ew")
+        
         self.label_contraccion = tk.Label(self.operaciones_ocultas_frame, text="Valor de MAX,MIN CONTRACION(Ejemplo:255,0):")
-        self.label_contraccion.grid(row=4, column=0, pady=5, sticky="w")
+        self.label_contraccion.grid(row=3, column=0, pady=5, sticky="w")
         self.entrada_contraccion = tk.Entry(self.operaciones_ocultas_frame)
-        self.entrada_contraccion.grid(row=5, column=0, pady=5, sticky="ew")
+        self.entrada_contraccion.grid(row=4, column=0, pady=5, sticky="ew")
+        self.contraction_button = tk.Button(self.operaciones_ocultas_frame, text="Aplicar Contracción", command=self.aplicar_contraccion)
+        self.contraction_button.grid(row=5, column=0, pady=5, sticky="ew")
 
 
-        self.desplazamiento = tk.Button(self.operaciones_ocultas_frame, text="Desplazamiento (Color)", command=self.aplicar_desplazamiento)
-        self.desplazamiento.grid(row=6, column=0, pady=5, sticky="ew")
+        
         self.label_desplazamiento = tk.Label(self.operaciones_ocultas_frame, text="Valor de Desplazamiento:")
-        self.label_desplazamiento.grid(row=7, column=0, pady=5, sticky="w")
+        self.label_desplazamiento.grid(row=6, column=0, pady=5, sticky="w")
         self.entrada_desplazamiento = tk.Entry(self.operaciones_ocultas_frame)
-        self.entrada_desplazamiento.grid(row=8, column=0, pady=5, sticky="ew")
+        self.entrada_desplazamiento.grid(row=7, column=0, pady=5, sticky="ew")
+        self.desplazamiento = tk.Button(self.operaciones_ocultas_frame, text="Desplazamiento (Color)", command=self.aplicar_desplazamiento)
+        self.desplazamiento.grid(row=8, column=0, pady=5, sticky="ew")
 
         #"""SUMA O RESTA POR MEDIO DE UN ESCALARE DE UNA IMAGEN"""
-        self.suma = tk.Button(self.operaciones_ocultas_frame, text="Suma o resta (suma:_,resta:-3)", command=self.aplicar_suma_resta_escalar)
-        self.suma.grid(row=9, column=0, pady=5, sticky="ew")
         self.label_suma = tk.Label(self.operaciones_ocultas_frame, text="Valor del Escalar:")
-        self.label_suma.grid(row=10, column=0, pady=5, sticky="w")
+        self.label_suma.grid(row=9, column=0, pady=5, sticky="w")
         self.entrada_suma = tk.Entry(self.operaciones_ocultas_frame)
-        self.entrada_suma.grid(row=11, column=0, pady=5, sticky="ew")
+        self.entrada_suma.grid(row=10, column=0, pady=5, sticky="ew")
+        self.suma = tk.Button(self.operaciones_ocultas_frame, text="Suma o resta (suma:_,resta:-3)", command=self.aplicar_suma_resta_escalar)
+        self.suma.grid(row=11, column=0, pady=5, sticky="ew")
 
         #"""UMBRALIZADO DE UNA IMAGEN"""
-        self.umbralizado = tk.Button(self.operaciones_ocultas_frame, text="Umbralizado de una imagen", command=self.aplicar_umbralizado)
-        self.umbralizado.grid(row=12, column=0, pady=5, sticky="ew")
         self.label_umbralizado = tk.Label(self.operaciones_ocultas_frame, text="Valor del Escalar -> Umbral:")
-        self.label_umbralizado.grid(row=13, column=0, pady=5, sticky="w")
+        self.label_umbralizado.grid(row=12, column=0, pady=5, sticky="w")
         self.entrada_umbralizado = tk.Entry(self.operaciones_ocultas_frame)
-        self.entrada_umbralizado.grid(row=14, column=0, pady=5, sticky="ew")
+        self.entrada_umbralizado.grid(row=13, column=0, pady=5, sticky="ew")
+        self.umbralizado = tk.Button(self.operaciones_ocultas_frame, text="Umbralizado de una imagen", command=self.aplicar_umbralizado)
+        self.umbralizado.grid(row=14, column=0, pady=5, sticky="ew")
         #Ecualizacion de una imagen
         self.equalize_button = tk.Button(self.operaciones_ocultas_frame, text="Ecualización Uniforme (Color)", command=self.aplicar_EU)
         self.equalize_button.grid(row=15, column=0, pady=5, sticky="ew")
@@ -157,13 +166,14 @@ class Editor:
         # -----------------------------
         # Sección de Operaciones Lógicas
         # -----------------------------
-        self.logicas_frame = tk.LabelFrame(button_frame, text="Operaciones Lógicas", padx=10, pady=10)
+        self.logicas_frame = tk.LabelFrame(button_frame, text="Operaciones Lógicas", padx=10, pady=10,bg="#BECACE",fg="#000000")
         self.logicas_frame.grid(row=2, column=0, sticky="ew", pady=5)
-        self.toggle_logicas_button = tk.Button(self.logicas_frame, text="Mostrar/Ocultar Operaciones Lógicas", command=self.toggle_logicas)
+        self.toggle_logicas_button = tk.Button(self.logicas_frame, text="Mostrar/Ocultar Operaciones Lógicas", command=self.toggle_logicas,bg="#BBBFBF",fg="#000000")
+        self.toggle_carga_button['font'] = f = font.Font(size=10)
         self.toggle_logicas_button.grid(row=0, column=0, pady=5, sticky="ew")
-
+        
         # Marco para las operaciones lógicas ocultas
-        self.operaciones_logicas_frame = tk.Frame(self.logicas_frame)
+        self.operaciones_logicas_frame = tk.Frame(self.logicas_frame,bg="#BECACE")
         # Botones para las operaciones lógicas-----------------
 
         self.operacion_or_button = tk.Button(self.operaciones_logicas_frame, text="Aplicar Operación OR", command=self.aplicar_operacion_or)
@@ -197,11 +207,31 @@ class Editor:
         self.inverso_imagenes_button.grid(row=8, column=0, pady=5, sticky="ew")
         self.operaciones_logicas_frame.grid(row=1, column=0, sticky="ew")
 
+
+
+        
+        self.filtro_frame = tk.LabelFrame(button_frame, text="Operaciones Filtro", padx=10, pady=10,bg="#BECACE",fg="#000000")
+        self.filtro_frame.grid(row=3, column=0, sticky="ew", pady=5)
+        self.toggle_filtro_button = tk.Button(self.filtro_frame, text="Mostrar/Ocultar Operaciones Lógicas", command=self.toggle_filtro,bg="#BBBFBF",fg="#000000")
+        self.toggle_carga_button['font'] = f = font.Font(size=10)
+        self.toggle_filtro_button.grid(row=0, column=0, pady=5, sticky="ew")
+
+        # Marco para las operaciones lógicas ocultas
+        self.operaciones_filtro_frame = tk.Frame(self.filtro_frame,bg="#BECACE")
+        # Botones para las operaciones lógicas-----------------
+        self.operaciones_filtro_frame.grid(row=1, column=0, sticky="ew")
+        
         
         # Inicialización de Imágenes
         self.original_image = None
         self.original_image_2 = None
         self.processed_image = None
+    def toggle_filtro(self):
+        # Mostrar u ocultar el marco de carga oculta
+        if self.operaciones_filtro_frame.winfo_ismapped():
+            self.operaciones_filtro_frame.grid_remove()
+        else:
+            self.operaciones_filtro_frame.grid()
 
     def toggle_carga(self):
         # Mostrar u ocultar el marco de carga oculta
