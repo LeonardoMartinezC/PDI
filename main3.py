@@ -33,12 +33,12 @@ class Editor:
         root.title("Aplicación de Procesamiento de Imágenes")
 
         # Crear el marco principal de la ventana
-        button_frame = tk.Frame(root)
-        button_frame.pack(side=tk.LEFT, padx=10, pady=10)
+        button_frame = tk.Frame(root, bg="#d9d9d9", relief="groove", borderwidth=2)
+        button_frame.pack(side=tk.LEFT, padx=15, pady=15, fill="y")
 
         # Crear un frame para las imágenes
-        image_frame = tk.Frame(root)
-        image_frame.pack(anchor='center', padx=10, pady=10)
+        image_frame = tk.Frame(root, bg="#e6e6e6", relief="ridge", borderwidth=2)
+        image_frame.pack(anchor='center', padx=15, pady=15, fill="both", expand=True)
 
         # -----------------------------
         # Sección de Etiquetas de Imagen
