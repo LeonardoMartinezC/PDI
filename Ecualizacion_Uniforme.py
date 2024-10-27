@@ -1,12 +1,18 @@
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
-#FECHA: 19/OCUTBRE/2024
+import os
+#FECHA: 27/OCUTBRE/2024
 
 #--------------------------------------------------------------------
-#TODAS LAS FUNCIONES RETORNAN LOS ARREGLOS
+#TODAS LAS FUNCIONES RETORNAN LOS ARREGLOS DE TIPO NUMPY
 
-
+"""
+Para correr el programa tienes que 
+estar en la cartpeta del proyecto esto se 
+debe a que hay una ruta especifica 
+donde se guarda el histograma
+"""
 #--------------------------------------------------------------------
 def frecuencia_pixeles_grises(imagen_gris):
     # Asegúrate de que la imagen esté en formato uint8
@@ -39,7 +45,7 @@ def redondear_personalizado(numero):
     else:
         return round(numero)
     
-def expancion_imagen(imagen,max,min):
+def expancion_imagen(imagen,max = 255,min = 0):
     MAX = max
     MIN = min
     # fmin es el valor minimo de gris en la imagen
@@ -53,7 +59,7 @@ def expancion_imagen(imagen,max,min):
     
     return imagen_expansion
 
-def contraccion_imagen(imagen,max,min):
+def contraccion_imagen(imagen,max = 255,min = 0):
     MAX = max
     MIN = min
     fmin = np.min(imagen)
@@ -159,10 +165,6 @@ class Operacion(object):
             numero = abs(numero)
             suma = cv.subtract(self.img,numero)
         return suma
-    # def resta_escalar(self,numero = 0):
-    # #Esta operacion resta un escala de la imagen
-    #     resta = cv.subtract(self.img,numero)
-    #     return resta
     
     def multiplicacion_escalar(self,numero = 0):
     #Esta operacion resta un escala de la imagen
@@ -178,6 +180,7 @@ class Operacion(object):
         img2 = cv.resize(self.img2, (tamaño[1],tamaño[0]))
         or_img = cv.bitwise_or(img1,img2)
         return or_img
+    
     def operacion_and(self,tamaño = None):
         #Cambia el tamaño si este se definio en la funcion
         if tamaño is None:
@@ -194,7 +197,7 @@ class Operacion(object):
             tamaño = self.img.shape
         img1 = cv.resize(self.img,(tamaño[1],tamaño[0]))
         img2 = cv.resize(self.img2, (tamaño[1],tamaño[0]))
-        xor_img = cv.bitwise_and(img1,img2)
+        xor_img = cv.bitwise_xor(img1,img2)
         return xor_img
     
     def operacion_gris(self):
@@ -345,14 +348,24 @@ class Operacion(object):
             plt.title('Histograma de la Imagen')
             # plt.show()
             if nombre_archivo:
-                plt.savefig(f'img2/{nombre_archivo}.jpg')  # Guarda la gráfica en formato PNG
+                ruta_g = os.path.abspath('img2') 
+                plt.savefig(f'{ruta_g}\{nombre_archivo}.jpg')  # Guarda la gráfica en formato PNG
                 print(f'Gráfica guardada como {nombre_archivo}.jpg')
                 plt.close() 
-                return str(f'img2/{nombre_archivo}.jpg')
-            # plt.show()
+                ruta = os.path.abspath(f'img2/{nombre_archivo}.jpg')
+                return ruta
+
         else:
-            print("ERROR!!")
-            return None
+            
+                plt.hist(self.gray_img.ravel(), bins=256, range=[0, 256])
+                plt.title('Histograma')
+                if nombre_archivo:
+                    ruta_g = os.path.abspath('img2') 
+                    plt.savefig(f'{ruta_g}\{nombre_archivo}.jpg')  # Guarda la gráfica en formato PNG
+                    print(f'Gráfica guardada como {nombre_archivo}.jpg')
+                    ruta = os.path.abspath(f'/img2/{nombre_archivo}.jpg')
+                    return ruta
+                
     def dar_arreglo(self):
         #Para que podamos manipular la imagen tenemmos que cambiar a rgb
         return self.img

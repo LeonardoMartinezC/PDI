@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 import numpy as np
 import matplotlib.pyplot as plt
 import Ecualizacion_Uniforme as eu
+import os
 
 """Asegurarse de tener las librerias descargadas para su uso
     de no ser asi ejecutar
@@ -13,6 +14,7 @@ import Ecualizacion_Uniforme as eu
     pip install Pillow
 
 """
+# Ultimo cambio echo fue el 27/10/2024
 
 # ------------------------------------------------------
 # Panel de Tkinter donde seleccionas imágenes y aplicas funciones
@@ -36,21 +38,46 @@ class Editor:
 
         # Crear un frame para las imágenes
         image_frame = tk.Frame(root)
-        image_frame.pack(side=tk.RIGHT, padx=10, pady=10)
+        image_frame.pack(anchor='center', padx=10, pady=10)
 
         # -----------------------------
         # Sección de Etiquetas de Imagen
         # -----------------------------
+        
+        root.configure(bg="#000332")
+        image_subframe1 = tk.Frame(image_frame, width=300, height=300, bg="#ffffff", relief="groove", borderwidth=2)
+        image_subframe1.grid(row=0, column=0, padx=15, pady=15, sticky="NW")
 
-        self.image_label3 = tk.Label(image_frame)
-        self.image_label3.pack(side=tk.TOP, padx=10, pady=10, expand=True, fill=tk.BOTH)
+        image_subframe2 = tk.Frame(image_frame, width=300, height=300, bg="#ffffff", relief="groove", borderwidth=2)
+        image_subframe2.grid(row=1, column=0, padx=15, pady=15, sticky="SW")
 
-        self.image_label1 = tk.Label(image_frame)
-        self.image_label1.pack(side=tk.TOP, padx=10, pady=10, expand=True, fill=tk.BOTH)
+        image_subframe3 = tk.Frame(image_frame, width=300, height=600, bg="#ffffff", relief="groove", borderwidth=2)
+        image_subframe3.grid(row=0, column=1, rowspan=2, padx=15, pady=15, sticky="E")
 
-        self.image_label2 = tk.Label(image_frame)
-        self.image_label2.pack(side=tk.TOP, padx=10, pady=10, expand=True, fill=tk.BOTH)
+        # Etiquetas de texto e imagen con fuente y colores mejorados
+        self.text_label1 = tk.Label(image_subframe1, text="Imagen 1", font=("Arial", 12, "bold"), bg="#ffffff")
+        self.text_label1.pack(side=tk.TOP, pady=(10, 5))  # Espacio superior ajustado
 
+        self.image_label1 = tk.Label(image_subframe1, text="Vista Previa Imagen 1", bg="#e6e6e6")
+        self.image_label1.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+        self.text_label2 = tk.Label(image_subframe2, text="Imagen 2", font=("Arial", 12, "bold"), bg="#ffffff")
+        self.text_label2.pack(side=tk.TOP, pady=(10, 5))
+
+        self.image_label2 = tk.Label(image_subframe2, text="Vista Previa Imagen 2", bg="#e6e6e6")
+        self.image_label2.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+        self.text_label3 = tk.Label(image_subframe3, text="Resultado", font=("Arial", 12, "bold"), bg="#ffffff")
+        self.text_label3.pack(side=tk.TOP, pady=(10, 5))
+
+        self.image_label3 = tk.Label(image_subframe3, text="Vista Previa Imagen 3", bg="#e6e6e6")
+        self.image_label3.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+        # Configuración de expansión y distribución uniforme
+        image_frame.grid_rowconfigure(0, weight=1)
+        image_frame.grid_rowconfigure(1, weight=1)
+        image_frame.grid_columnconfigure(0, weight=1)
+        image_frame.grid_columnconfigure(1, weight=1)
         # -----------------------------
         # Sección de Carga de Imágenes
         # -----------------------------
@@ -219,53 +246,33 @@ class Editor:
             self.original_image = self.imagen1
             print(self.imagen1)
             self.display_image(self.imagen1,self.image_label1)
-
     def display_image(self, img, label):
         # Verificar si la imagen está en formato BGR y convertirla a RGB
         imagen = img.dar_arreglo()
         tam = imagen.shape
-        print(tam)
-        tam1 = tam[0]//2
-        tam2 = tam[1]//2
-    # Verificar si la imagen está en formato BGR y convertirla a RGB
-        if len(imagen.shape) == 3 and imagen.shape[2] == 3:  # Si la imagen tiene 3 canales de color
+        
+        # Convertir BGR a RGB si es necesario
+        if len(imagen.shape) == 3 and imagen.shape[2] == 3:
             imagen = cv.cvtColor(imagen, cv.COLOR_BGR2RGB)
 
-        if(tam[0]>600 and tam[1]> 1200):
-            imagen = cv.resize(imagen, (tam2,tam1)) 
+        # Redimensionar la imagen si es necesario
+        tam1, tam2 = tam[0], tam[1]
+        if tam1 >= 500 and tam2 >= 640 or (tam1 >= 640 and tam2 >= 500):
+            tam1 //= 2
+            tam2 //= 2
+            print(tam)
+            imagen = cv.resize(imagen, (tam2, tam1))
+        elif tam1 > 600 and tam2 > 1000 or (tam1 > 1000 and tam2 > 800):
+            tam1 //= 3
+            tam2 //= 3
+            imagen = cv.resize(imagen, (tam2, tam1))
 
         img_pil = Image.fromarray(imagen)
-        # Convertir la imagen PIL a un formato que Tkinter pueda mostrar
         img_tk = ImageTk.PhotoImage(img_pil)
-        # Actualizar la etiqueta de la GUI con la imagen
+
+        # Actualizar la etiqueta de imagen
         label.configure(image=img_tk)
-        label.image = img_tk
-
-    # def display_image(self, img):
-    #     #A ESTA FUNCION SIMEPRE LE TIENE QUE LLEGAR UN OBJETO IMAGEN()--------------
-    #     imagen = img.dar_arreglo()
-    #     tam = imagen.shape
-    # # Verificar si la imagen está en formato BGR y convertirla a RGB
-    #     if len(imagen.shape) == 3 and imagen.shape[2] == 3:  # Si la imagen tiene 3 canales de color
-    #         imagen = cv.cvtColor(imagen, cv.COLOR_BGR2RGB)
-    #         print(imagen)
-    #         tam1 = tam[0]//2
-    #         tam2 = tam[1]//2
-    #         imagen = cv.resize(imagen, (tam1,tam2,3)) 
-    #     else:
-    #         tam1 = tam[0]//2
-    #         tam2 = tam[1]//2
-    #         imagen = cv.resize(imagen, (tam1,tam2))
-    #     # Convertir el arreglo numpy a una imagen PIL
-    #     img_pil = Image.fromarray(imagen)
-    #     # Convertir la imagen PIL a un formato que Tkinter pueda mostrar
-    #     img_tk = ImageTk.PhotoImage(img_pil)
-    #     # Actualizar la etiqueta de la GUI con la imagen
-    #     self.image_label.configure(image=img_tk)
-    #     self.image_label.image = img_tk 
-
-    
-    
+        label.image = img_tk  # Mantener una referencia a la imagen para evitar que se recoja
 
 
 
@@ -282,6 +289,7 @@ class Editor:
                     expancion_image = expancion_image.operacion_expancion_color()  # Llama sin argumentos
                 
                 img_cargada = guardar_imagen(expancion_image, 'Expansion')
+                
                 self.display_image(img_cargada,self.image_label3)
             except ValueError:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
@@ -487,8 +495,8 @@ class Editor:
             b,g,r = mul_dos_img.extraccion_canales()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             #"""SOLO MOSTRARA LA IMAGEN DEL CANAL ROJO"
-            img_cargada = guardar_imagen(b,'g')
-            img_cargada = guardar_imagen(g,'b')
+            img_cargada = guardar_imagen(b,'b')
+            img_cargada = guardar_imagen(g,'g')
             img_cargada = guardar_imagen(r,'r')
         
             self.display_image(img_cargada,self.image_label3)
