@@ -28,6 +28,7 @@ def frecuencia_pixeles_grises(imagen_gris):
     #retorna la frecuencia acumulada para el uso en la ecualizacion Uniforme
     return frecuencia_acumulada
 
+
 def ordenarImagen(imagen):
     #PONER LA IMAGEN EN ORDEN RGB
     img_rgb = cv.cvtColor(imagen, cv.COLOR_BGR2RGB)
@@ -323,8 +324,36 @@ class Operacion(object):
             canales_gris = cv.split(self.img)
             return  canales_gris,canales_gris,canales_gris
 
-
-
+    def filtro_mediana(self, parametro = None):
+        imagen_2 = []
+        tam = self.img.shape
+        print(tam)
+        tam_1 = tam[0]
+        tam_2 = tam[1]
+        for i in range(tam_1):
+            for j in range(tam_2):
+                
+                if (0 < i < tam_1 - 1) and (0 < j < tam_2 - 1):
+                    lista = []
+                    lista1 =[]
+                    for k in range(0,3):
+                        lista.append(self.img[i-1][j-1][k])
+                        lista.append(self.img[i-1][j][k])
+                        lista.append(self.img[i][j-1][k])
+                        lista.append(self.img[i+1][j+1][k])
+                        lista.append(self.img[i+1][j][k])
+                        lista.append(self.img[i][j+1][k])
+                        lista.append(self.img[i+1][j-1][k])
+                        lista.append(self.img[i-1][j+1][k])
+                        lista.sort()
+                        x = lista[4]
+                        lista1.append(x)
+                        lista = []
+                    imagen_2.append(lista1)
+                else:
+                    imagen_2.append(self.img[i][j])
+        imagen_2 = np.array(imagen_2).reshape(tam)
+        return imagen_2
 
     def hacer_histograma_grises(self,nombre_archivo = None):
         # Histograma de la imagen en escala de grises
@@ -366,19 +395,40 @@ class Operacion(object):
                     ruta = os.path.abspath(f'/img2/{nombre_archivo}.jpg')
                     return ruta
                 
+    
+    def ruidoSP(self, probabilidad = 0.005):
+        alto, ancho = self.img.shape[:2]
+        imagen_ruidosa = self.img.copy()
+
+        # Cantidad de píxeles afectados
+        cantidad_ruido = int(probabilidad * imagen_ruidosa.size // imagen_ruidosa.shape[-1])
+
+        # Píxeles de "sal" (blancos)
+        coords_sal = [np.random.randint(0, dim - 1, cantidad_ruido) for dim in imagen_ruidosa.shape[:2]]
+        imagen_ruidosa[coords_sal[0], coords_sal[1]] = 255
+
+        # Píxeles de "pimienta" (negros)
+        coords_pimienta = [np.random.randint(0, dim - 1, cantidad_ruido) for dim in imagen_ruidosa.shape[:2]]
+        imagen_ruidosa[coords_pimienta[0], coords_pimienta[1]] = 0
+
+        return imagen_ruidosa
+
+
+    def ruido_gaussiano(self, media = 0, desviacion = 25):
+        ruido = np.random.normal(media, desviacion, self.img.shape).astype(np.float32)
+        imagen_ruidosa = self.img.astype(np.float32) + ruido
+        imagen_ruidosa = np.clip(imagen_ruidosa, 0, 255).astype(np.uint8)
+        return imagen_ruidosa
+    
+
     def dar_arreglo(self):
         #Para que podamos manipular la imagen tenemmos que cambiar a rgb
         return self.img
 if __name__ == '__main__':
-    imagen = Imagen('../img/Alvaro.jpg')
-    imagen_2 = Imagen('img/o.jpg')
-
+    imagen = Imagen('img/b.jpg')
+    imagen_2 = Imagen('img/b.jpg')
+    print(imagen.img)
+    print("sdlfjsldf")
     operacion = Operacion(imagen,imagen_2)
-    suma = operacion.operacion_expancion_color()
-    operacion.hacer_histograma_grises()
-    imagenes = Crear_imagen(suma)
-    imagenes.guardarImagen("img/suma_escalar2.jpg")
-    ruta = imagenes.dar_ruta()
-    imagen.showImage()
-    imagen2= Imagen(ruta)
-    imagen2.showImage()
+    o = operacion.filtro_mediana()
+    print(o)

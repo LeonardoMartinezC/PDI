@@ -203,8 +203,8 @@ class Editor:
         self.inverso_imagenes_button = tk.Button(self.operaciones_logicas_frame, text="Aplicar inverso a Imagen", command=self.aplicar_inverso)
         self.inverso_imagenes_button.grid(row=7, column=0, pady=5, sticky="ew")
         #EXTRACCION DE CANALES
-        self.inverso_imagenes_button = tk.Button(self.operaciones_logicas_frame, text="Aplicar Extraccion de Canales", command=self.aplicar_extraccion_canales)
-        self.inverso_imagenes_button.grid(row=8, column=0, pady=5, sticky="ew")
+        self.extraccion_imagenes_button = tk.Button(self.operaciones_logicas_frame, text="Aplicar Extraccion de Canales", command=self.aplicar_extraccion_canales)
+        self.extraccion_imagenes_button.grid(row=8, column=0, pady=5, sticky="ew")
         self.operaciones_logicas_frame.grid(row=1, column=0, sticky="ew")
 
 
@@ -216,9 +216,26 @@ class Editor:
         self.toggle_carga_button['font'] = f = font.Font(size=10)
         self.toggle_filtro_button.grid(row=0, column=0, pady=5, sticky="ew")
 
-        # Marco para las operaciones lógicas ocultas
+        # Marco para las operaciones de filtro aqui ocultas
         self.operaciones_filtro_frame = tk.Frame(self.filtro_frame,bg="#BECACE")
-        # Botones para las operaciones lógicas-----------------
+
+        self.filtro_mediana_imagenes_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar Filtro Mediana", command=self.aplicar_filtro_mediana)
+        self.filtro_mediana_imagenes_button.grid(row=0, column=0, pady=5, sticky="ew")
+        # Botones para las operaciones de filtro y ruido-----------------
+        #"""Rudio Gaussiano para las imagenes que se pusieron"
+        self.label_ruido_gaussiano = tk.Label(self.operaciones_filtro_frame, text="Valor de media,desviacion CONTRACION(Ejemplo:0,25):")
+        self.label_ruido_gaussiano.grid(row=3, column=0, pady=5, sticky="w")
+        self.entrada_ruido_gaussiano = tk.Entry(self.operaciones_filtro_frame)
+        self.entrada_ruido_gaussiano.grid(row=4, column=0, pady=5, sticky="ew")
+        self.ruido_gaussiano_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar ruido gaussiano", command=self.aplicar_ruido_gaussiano)
+        self.ruido_gaussiano_button.grid(row=5, column=0, pady=5, sticky="ew")
+        # """Aplicar ruido sal y pimienta en las imagenes """
+        self.label_ruido_sp = tk.Label(self.operaciones_filtro_frame, text="Valor de probabilidad:(0.05)")
+        self.label_ruido_sp.grid(row=6, column=0, pady=5, sticky="w")
+        self.entrada_ruido_sp = tk.Entry(self.operaciones_filtro_frame)
+        self.entrada_ruido_sp.grid(row=7, column=0, pady=5, sticky="ew")
+        self.ruido_sp = tk.Button(self.operaciones_filtro_frame, text="Ruido sal y pimienta", command=self.aplicar_ruido_sp)
+        self.ruido_sp.grid(row=8, column=0, pady=5, sticky="ew")
         self.operaciones_filtro_frame.grid(row=1, column=0, sticky="ew")
         
         
@@ -348,7 +365,48 @@ class Editor:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
+
+    def aplicar_ruido_gaussiano(self):
+        if self.original_image is not None:
+            try:
+                maximo_input = self.entrada_ruido_gaussiano.get()
+                print(maximo_input)
+                
+                ruido_gaussiano_image = eu.Operacion(self.original_image)
+                
+                # Comprobar si maximo_input está vacío y manejarlo adecuadamente
+                if maximo_input:  # Si hay un valor ingresado
+                    maximo = tuple(map(int, maximo_input.split(',')))  # Convertir a tupla de enteros
+                    ruido_gaussiano_image = ruido_gaussiano_image.ruido_gaussiano(maximo[0], maximo[1])
+                else:  # Si no se ingresó ningún valor
+                    ruido_gaussiano_image = ruido_gaussiano_image.ruido_gaussiano()  # Llama sin argumentos
+                #Devolver objeto Imagen() para pasarlo a display_imgage
+                img_cargada = guardar_imagen(ruido_gaussiano_image, 'ruido_gaussiano')
+                self.display_image(img_cargada,self.image_label3)
+            except ValueError:
+                messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
+        else:
+            messagebox.showerror("Error", "Cargar una imagen primero")
     
+    def aplicar_ruido_sp(self):
+            if self.original_image is not None:
+                try:
+                    #Necesitamos tomar un valor de desplazamiento que se define en la interfaz
+                    ruido = self.entrada_ruido_sp.get() # Obtener valor de desplazamiento
+                    print(ruido)
+                    ruidoSP = eu.Operacion(self.original_image)
+                    if ruido:
+                        ruidoSP = ruidoSP.ruidoSP(int(ruido))  # Usar el valor
+                    else:
+                        ruidoSP = ruidoSP.ruidoSP()
+                    img_cargada = guardar_imagen(ruidoSP, 'ruido_sal_pimienta')
+                    self.display_image(img_cargada,self.image_label3)
+                except ValueError:
+                    messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+            
+        
     def aplicar_desplazamiento(self):
         if self.original_image is not None:
             try:
@@ -550,6 +608,19 @@ class Editor:
         
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
+
+    def aplicar_filtro_mediana(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                f_mediana = eu.Operacion(self.original_image)
+                #Llamamos a la operacion INVERSO
+                f_mediana = f_mediana.filtro_mediana()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(f_mediana,'filtro_mediana')
+            
+                self.display_image(img_cargada,self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
 # ------------------------------------------------------
 # Ejecutar la aplicación
 if __name__ == "__main__":
