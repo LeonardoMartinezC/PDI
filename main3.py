@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 import Ecualizacion_Uniforme as eu
 import os
 import tkinter.font as font
+#FECHA: 27/OCUTBRE/2024
+# © 2024 Leonardo. Todos los derechos reservados.
+# Este código está protegido por las leyes de derechos de autor. 
+# Prohibida su distribución sin el permiso explícito del autor.
 
 """Asegurarse de tener las librerias descargadas para su uso
     de no ser asi ejecutar
@@ -15,7 +19,7 @@ import tkinter.font as font
     pip install Pillow
 
 """
-# Ultimo cambio echo fue el 27/10/2024
+# Ultimo cambio echo fue el 01/11/2024
 
 # ------------------------------------------------------
 # Panel de Tkinter donde seleccionas imágenes y aplicas funciones
@@ -208,11 +212,11 @@ class Editor:
         self.operaciones_logicas_frame.grid(row=1, column=0, sticky="ew")
 
 
-
+        
         
         self.filtro_frame = tk.LabelFrame(button_frame, text="Operaciones Filtro", padx=10, pady=10,bg="#BECACE",fg="#000000")
         self.filtro_frame.grid(row=3, column=0, sticky="ew", pady=5)
-        self.toggle_filtro_button = tk.Button(self.filtro_frame, text="Mostrar/Ocultar Operaciones Lógicas", command=self.toggle_filtro,bg="#BBBFBF",fg="#000000")
+        self.toggle_filtro_button = tk.Button(self.filtro_frame, text="Mostrar/Ocultar Operaciones de Ruido", command=self.toggle_filtro,bg="#BBBFBF",fg="#000000")
         self.toggle_carga_button['font'] = f = font.Font(size=10)
         self.toggle_filtro_button.grid(row=0, column=0, pady=5, sticky="ew")
 
@@ -221,21 +225,27 @@ class Editor:
 
         self.filtro_mediana_imagenes_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar Filtro Mediana", command=self.aplicar_filtro_mediana)
         self.filtro_mediana_imagenes_button.grid(row=0, column=0, pady=5, sticky="ew")
+        #Aplicacion de Filtro Prewit
+        self.filtro_prewit_imagenes_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar Filtro Prewit", command=self.aplicar_filtro_prewit)
+        self.filtro_prewit_imagenes_button.grid(row=1, column=0, pady=5, sticky="ew")
+
+
+
         # Botones para las operaciones de filtro y ruido-----------------
         #"""Rudio Gaussiano para las imagenes que se pusieron"
-        self.label_ruido_gaussiano = tk.Label(self.operaciones_filtro_frame, text="Valor de media,desviacion CONTRACION(Ejemplo:0,25):")
-        self.label_ruido_gaussiano.grid(row=3, column=0, pady=5, sticky="w")
+        self.label_ruido_gaussiano = tk.Label(self.operaciones_filtro_frame, text="Valor de media,desviacion (Ejemplo:0,25):")
+        self.label_ruido_gaussiano.grid(row=2, column=0, pady=5, sticky="w")
         self.entrada_ruido_gaussiano = tk.Entry(self.operaciones_filtro_frame)
-        self.entrada_ruido_gaussiano.grid(row=4, column=0, pady=5, sticky="ew")
+        self.entrada_ruido_gaussiano.grid(row=3, column=0, pady=5, sticky="ew")
         self.ruido_gaussiano_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar ruido gaussiano", command=self.aplicar_ruido_gaussiano)
-        self.ruido_gaussiano_button.grid(row=5, column=0, pady=5, sticky="ew")
+        self.ruido_gaussiano_button.grid(row=4, column=0, pady=5, sticky="ew")
         # """Aplicar ruido sal y pimienta en las imagenes """
         self.label_ruido_sp = tk.Label(self.operaciones_filtro_frame, text="Valor de probabilidad:(0.05)")
-        self.label_ruido_sp.grid(row=6, column=0, pady=5, sticky="w")
+        self.label_ruido_sp.grid(row=5, column=0, pady=5, sticky="w")
         self.entrada_ruido_sp = tk.Entry(self.operaciones_filtro_frame)
-        self.entrada_ruido_sp.grid(row=7, column=0, pady=5, sticky="ew")
+        self.entrada_ruido_sp.grid(row=6, column=0, pady=5, sticky="ew")
         self.ruido_sp = tk.Button(self.operaciones_filtro_frame, text="Ruido sal y pimienta", command=self.aplicar_ruido_sp)
-        self.ruido_sp.grid(row=8, column=0, pady=5, sticky="ew")
+        self.ruido_sp.grid(row=7, column=0, pady=5, sticky="ew")
         self.operaciones_filtro_frame.grid(row=1, column=0, sticky="ew")
         
         
@@ -617,6 +627,19 @@ class Editor:
                 f_mediana = f_mediana.filtro_mediana()
                 #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
                 img_cargada = guardar_imagen(f_mediana,'filtro_mediana')
+            
+                self.display_image(img_cargada,self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+
+    def aplicar_filtro_prewit(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                f_prewitt = eu.Operacion(self.original_image)
+                #Llamamos a la operacion INVERSO
+                f_prewitt = f_prewitt.filtro_prewitt()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(f_prewitt,'filtro_prewitt')
             
                 self.display_image(img_cargada,self.image_label3)
             else:

@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 #FECHA: 27/OCUTBRE/2024
+# © 2024 Leonardo. Todos los derechos reservados.
+# Este código está protegido por las leyes de derechos de autor. 
+# Prohibida su distribución sin el permiso explícito del autor.
 
 #--------------------------------------------------------------------
 #TODAS LAS FUNCIONES RETORNAN LOS ARREGLOS DE TIPO NUMPY
@@ -354,6 +357,40 @@ class Operacion(object):
                     imagen_2.append(self.img[i][j])
         imagen_2 = np.array(imagen_2).reshape(tam)
         return imagen_2
+
+    def filtro_prewitt(self, parametro=None):
+        imagen_prewitt = []
+        tam = self.img.shape
+        tam_1, tam_2, _ = tam
+
+        # Definimos las máscaras de Prewitt
+        prewitt_x = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]])
+        prewitt_y = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
+
+        for i in range(tam_1):
+            fila = []
+            for j in range(tam_2):
+                if 0 < i < tam_1 - 1 and 0 < j < tam_2 - 1:
+                    gradiente_rgb = []
+                    for k in range(3):  # Procesar cada canal RGB por separado
+                        # Extraemos la vecindad 3x3 del canal actual
+                        ventana = self.img[i-1:i+2, j-1:j+2, k]
+                        # Calculamos la respuesta del filtro Prewitt en x e y
+                        gx = np.sum(ventana * prewitt_x)
+                        gy = np.sum(ventana * prewitt_y)
+                        # Magnitud del gradiente
+                        magnitud = np.sqrt(gx**2 + gy**2)
+                        magnitud = min(255, max(0, int(magnitud)))  # Limitamos a [0, 255]
+
+                        gradiente_rgb.append(magnitud)
+                    fila.append(gradiente_rgb)
+                else:
+                    # Para los bordes, copiamos el valor original del pixel
+                    fila.append(self.img[i][j].tolist())
+            imagen_prewitt.append(fila)
+
+        imagen_prewitt = np.array(imagen_prewitt, dtype=np.uint8)
+        return imagen_prewitt
 
     def hacer_histograma_grises(self,nombre_archivo = None):
         # Histograma de la imagen en escala de grises
