@@ -2,6 +2,8 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from scipy.signal import find_peaks
+from scipy.ndimage import median_filter
 #FECHA: 27/OCUTBRE/2024
 # © 2024 Leonardo. Todos los derechos reservados.
 # Este código está protegido por las leyes de derechos de autor. 
@@ -140,17 +142,18 @@ class Imagen(object):
 
 
 
-
 class Operacion(object):
     def __init__(self, imagen,imagen2 = None):
         #Esto debe ser el arreglo de la imagen
-        self.img = imagen.dar_arreglo()
-        #Verifica si existe una imagen2 
-        if(imagen2 is not None):
-            self.img2 = imagen2.dar_arreglo()
-        else:
-            self.img2 = None
-        #verifica si es una imgen de color
+        self.img = imagen
+        self.img2 = imagen2
+        # self.img = imagen.dar_arreglo()
+        # #Verifica si existe una imagen2 
+        # if(imagen2 is not None):
+        #     self.img2 = imagen2.dar_arreglo()
+        # else:
+        #     self.img2 = None
+        # #verifica si es una imgen de color
         if len(self.img.shape) == 3:
             print("Esta operacion es con una imagen de color")
             self.gray_img =cv.cvtColor(self.img,cv.COLOR_BGR2GRAY)
@@ -327,70 +330,76 @@ class Operacion(object):
             canales_gris = cv.split(self.img)
             return  canales_gris,canales_gris,canales_gris
 
-    def filtro_mediana(self, parametro = None):
-        imagen_2 = []
-        tam = self.img.shape
-        print(tam)
-        tam_1 = tam[0]
-        tam_2 = tam[1]
-        for i in range(tam_1):
-            for j in range(tam_2):
-                
-                if (0 < i < tam_1 - 1) and (0 < j < tam_2 - 1):
-                    lista = []
-                    lista1 =[]
-                    for k in range(0,3):
-                        lista.append(self.img[i-1][j-1][k])
-                        lista.append(self.img[i-1][j][k])
-                        lista.append(self.img[i][j-1][k])
-                        lista.append(self.img[i+1][j+1][k])
-                        lista.append(self.img[i+1][j][k])
-                        lista.append(self.img[i][j+1][k])
-                        lista.append(self.img[i+1][j-1][k])
-                        lista.append(self.img[i-1][j+1][k])
-                        lista.sort()
-                        x = lista[4]
-                        lista1.append(x)
-                        lista = []
-                    imagen_2.append(lista1)
-                else:
-                    imagen_2.append(self.img[i][j])
-        imagen_2 = np.array(imagen_2).reshape(tam)
-        return imagen_2
+    def filtro_mediana(self, kernel_size=3):
+    # Copiamos la imagen original para trabajar sobre ella
+        # imagen_filtrada = np.zeros_like(self.img)
+        # print(self.img.shape)
+        # # Dimensiones de la imagen
+        # filas, columnas = self.img.shape[:2]
+        # canales = 1 if len(self.img.shape) == 2 else self.img.shape[2]
+
+        # # Aplicamos el filtro de mediana
+        # for i in range(1, filas - 1):
+        #     for j in range(1, columnas - 1):
+        #         for c in range(canales):
+        #             # Extraemos la ventana 3x3 alrededor del píxel (i, j) para el canal c
+        #             ventana = self.img[i - 1:i + 2, j - 1:j + 2, c] if canales > 1 else self.img[i - 1:i + 2, j - 1:j + 2]
+                    
+        #             # Calculamos la mediana
+        #             mediana = np.median(ventana)
+                    
+        #             # Asignamos el valor calculado al píxel de la imagen filtrada
+        #             if canales > 1:
+        #                 imagen_filtrada[i, j, c] = mediana
+        #             else:
+        #                 imagen_filtrada[i, j] = mediana
+
+        # # Para los bordes, mantenemos los valores originales
+        # # imagen_filtrada[0, :, :] = self.img[0, :, :]
+        # # imagen_filtrada[-1, :, :] = self.img[-1, :, :]
+        # # imagen_filtrada[:, 0, :] = self.img[:, 0, :]
+        # # imagen_filtrada[:, -1, :] = self.img[:, -1, :]
+        if len(self.img.shape) == 2:  # Imagen en escala de grises
+                imagen_filtrada = median_filter(self.img, size=kernel_size, mode='reflect')
+        else:  # Imagen a color
+                imagen_filtrada = np.zeros_like(self.img)
+                for c in range(self.img.shape[2]):
+                    imagen_filtrada[:, :, c] = median_filter(self.img[:, :, c], size=kernel_size, mode='reflect')
+            
+        return imagen_filtrada
+
 
     def filtro_prewitt(self, parametro=None):
         imagen_prewitt = []
         tam = self.img.shape
-        tam_1, tam_2, _ = tam
+        tam_1, tam_2 = tam[0], tam[1]
 
         # Definimos las máscaras de Prewitt
-        prewitt_x = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]])
-        prewitt_y = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
+        prewitt_x = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]]) * (1/3)
+        prewitt_y = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]]) * (1/3)
 
         for i in range(tam_1):
             fila = []
             for j in range(tam_2):
                 if 0 < i < tam_1 - 1 and 0 < j < tam_2 - 1:
-                    gradiente_rgb = []
-                    for k in range(3):  # Procesar cada canal RGB por separado
-                        # Extraemos la vecindad 3x3 del canal actual
-                        ventana = self.img[i-1:i+2, j-1:j+2, k]
-                        # Calculamos la respuesta del filtro Prewitt en x e y
-                        gx = np.sum(ventana * prewitt_x)
-                        gy = np.sum(ventana * prewitt_y)
-                        # Magnitud del gradiente
-                        magnitud = np.sqrt(gx**2 + gy**2)
-                        magnitud = min(255, max(0, int(magnitud)))  # Limitamos a [0, 255]
-
-                        gradiente_rgb.append(magnitud)
-                    fila.append(gradiente_rgb)
+                    # Extraemos la vecindad 3x3
+                    ventana = self.img[i-1:i+2, j-1:j+2]
+                    # Calculamos la respuesta del filtro Prewitt en x e y
+                    gx = np.sum(ventana * prewitt_x)
+                    gy = np.sum(ventana * prewitt_y)
+                    # Magnitud del gradiente
+                    magnitud = np.sqrt(gx**2 + gy**2)
+                    magnitud = min(255, max(0, int(magnitud)))  # Limitamos a [0, 255]
+                    fila.append(magnitud)
                 else:
                     # Para los bordes, copiamos el valor original del pixel
-                    fila.append(self.img[i][j].tolist())
+                    fila.append(self.img[i][j])
             imagen_prewitt.append(fila)
 
+        # Convertimos la lista resultante a un arreglo NumPy
         imagen_prewitt = np.array(imagen_prewitt, dtype=np.uint8)
         return imagen_prewitt
+
 
     def hacer_histograma_grises(self,nombre_archivo = None):
         # Histograma de la imagen en escala de grises
@@ -457,15 +466,270 @@ class Operacion(object):
         imagen_ruidosa = np.clip(imagen_ruidosa, 0, 255).astype(np.uint8)
         return imagen_ruidosa
     
+    
+    def minimo_histograma(self):
+        histograma, _ = np.histogram(self.gray_img, bins=256, range=(0, 256))
+        
+        # Encontrar picos en el histograma
+        print(histograma)
+        picos, _ = find_peaks(histograma, distance=20)
+        
+        minimo = np.argmin(histograma[picos[0]:picos[1]]) + picos[0]
+        
+        # Aplicar umbral
+        imagen_minimo = (self.gray_img > minimo).astype(np.uint8) * 255
+        return imagen_minimo
 
+
+
+        
+
+    def filtro_promedio(self, tamaño_kernel=3):
+    # Obtener las dimensiones de la imagen
+        alto, ancho = self.img.shape
+        print(self.img.shape)
+        # Definir el margen de la vecindad
+        margen = tamaño_kernel // 2
+        
+        # Crear una imagen vacía para almacenar los resultados
+        imagen_filtrada = np.zeros_like(self.img)
+        
+        # Recorrer la imagen
+        for i in range(margen, alto - margen):
+            for j in range(margen, ancho - margen):
+                # Extraer la vecindad alrededor del píxel
+                vecindad = self.img[i - margen:i + margen + 1, j - margen:j + margen + 1]
+                
+                # Calcular el promedio de la vecindad y asignarlo al píxel
+                imagen_filtrada[i, j] = np.mean(vecindad)
+        
+        return imagen_filtrada
+
+    def filtro_minimo(self, tamaño_kernel=3):
+        # Obtener las dimensiones de la imagen
+        alto, ancho = self.img.shape
+        print(self.img.shape)
+        # Definir el margen de la vecindad
+        margen = tamaño_kernel // 2
+        
+        # Crear una imagen vacía para almacenar los resultados
+        imagen_filtrada = np.zeros_like(self.img)
+        
+        # Recorrer la imagen
+        for i in range(margen, alto - margen):
+            for j in range(margen, ancho - margen):
+                # Extraer la vecindad alrededor del píxel
+                vecindad = self.img[i - margen:i + margen + 1, j - margen:j + margen + 1]
+                
+                # Obtener el valor mínimo de la vecindad y asignarlo al píxel
+                imagen_filtrada[i, j] = np.min(vecindad)
+        
+        return imagen_filtrada
+
+    def filtro_maximo(self, tamaño_kernel=3):
+        # Obtener las dimensiones de la imagen
+        alto, ancho = self.img.shape
+        print(self.img.shape)
+        # Definir el margen de la vecindad
+        margen = tamaño_kernel // 2
+        
+        # Crear una imagen vacía para almacenar los resultados
+        imagen_filtrada = np.zeros_like(self.img)
+        
+        # Recorrer la imagen
+        for i in range(margen, alto - margen):
+            for j in range(margen, ancho - margen):
+                # Extraer la vecindad alrededor del píxel
+                vecindad = self.img[i - margen:i + margen + 1, j - margen:j + margen + 1]
+                
+                # Obtener el valor máximo de la vecindad y asignarlo al píxel
+                imagen_filtrada[i, j] = np.max(vecindad)
+        
+        return imagen_filtrada
+    def filtro_sobel(self):
+        # Definir los kernels de Sobel
+        kernel_x = np.array([[-1, 0, 1],
+                             [-2, 0, 2],
+                             [-1, 0, 1]])
+        kernel_y = np.array([[-1, -2, -1],
+                             [ 0,  0,  0],
+                             [ 1,  2,  1]])
+        
+        # Obtener las dimensiones de la imagen
+        alto, ancho = self.img.shape
+        
+        # Crear una imagen vacía para almacenar los resultados
+        imagen_filtrada = np.zeros_like(self.img, dtype=np.float32)
+        
+        # Definir el tamaño del kernel (siempre será 3x3 para Sobel)
+        margen = 1
+        
+        # Recorrer la imagen
+        for i in range(margen, alto - margen):
+            for j in range(margen, ancho - margen):
+                # Extraer la vecindad alrededor del píxel
+                vecindad = self.img[i - margen:i + margen + 1, j - margen:j + margen + 1]
+                
+                # Aplicar los kernels
+                gx = np.sum(kernel_x * vecindad)
+                gy = np.sum(kernel_y * vecindad)
+                
+                # Calcular la magnitud del gradiente
+                magnitud = np.sqrt(gx**2 + gy**2)
+                
+                # Asignar el valor al píxel
+                imagen_filtrada[i, j] = magnitud
+        
+        # Normalizar la imagen a valores de 0 a 255
+        imagen_filtrada = np.clip(imagen_filtrada, 0, 255).astype(np.uint8)
+        
+        return imagen_filtrada
+
+    def operacion_dilatacion(self):
+        # kernel = np.ones((5,5), np.uint8)
+        # kernel = np.array(
+        #         [ 
+        #             [0, 1, 0],
+        #             [1, 1, 1],
+        #             [0, 1, 0]
+        #         ],dtype=np.uint8)
+        kernel = np.array(
+                [ 
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
+                ],dtype=np.uint8)
+        imagen_dilatada = cv.dilate(self.img, kernel, iterations = 1)
+        return imagen_dilatada
+    def operacion_erosion(self):
+        # kernel = np.ones((5,5), np.uint8)
+        # kernel = np.array(
+        #         [ 
+        #             [0,0,0,0,1],
+        #             [0,0,0,1,0],
+        #             [0,0,1,0,0],
+        #             [0,1,0,0,0],
+        #             [1,0,0,0,0],
+                    
+        #         ],dtype=np.uint8)
+        kernel = np.array(
+                [ 
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
+                ],dtype=np.uint8)
+        imagen_erosionada = cv.erode(self.img, kernel, iterations = 1)
+        return imagen_erosionada
+    def operacion_apertura(self):
+        # kernel = np.ones((5,5), np.uint8)
+        kernel = np.array(
+                [ 
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
+                ],dtype=np.uint8)
+        # kernel = np.ones((5,5), np.uint8)
+        imagen_apertura = cv.morphologyEx(self.img, cv.MORPH_OPEN, kernel)
+        return imagen_apertura
+    def operacion_cierre(self):
+        # kernel = np.ones((5,5), np.uint8)
+        # kernel = np.ones((5,5), np.uint8)
+        kernel = np.array(
+                [ 
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
+                ],dtype=np.uint8)
+        imagen_cierre = cv.morphologyEx(self.img, cv.MORPH_CLOSE, kernel)
+        return imagen_cierre
+    def tophat(self):
+        kernel = np.array(
+                [ 
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
+                ],dtype=np.uint8)
+        top_hat = cv.morphologyEx(self.img, cv.MORPH_TOPHAT, kernel)
+        return top_hat
+    def bothat(self):
+        kernel = np.array(
+                [ 
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
+                ],dtype=np.uint8)
+        bothat = cv.morphologyEx(self.img, cv.MORPH_BLACKHAT, kernel)
+        return bothat
+    def gradiente_dilatacion(self):
+        kernel = np.array(
+            [
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1]
+            ], dtype=np.uint8)
+        
+        dilatada = cv.dilate(self.img, kernel)  # Aplicar dilatación
+        gradiente_dilatacion = cv.subtract(dilatada, self.img)  # Resta
+        return gradiente_dilatacion
+
+    # Gradiente por Erosión
+    def gradiente_erosion(self):
+        kernel = np.array(
+            [
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1]
+            ], dtype=np.uint8)
+        
+        erosionada = cv.erode(self.img, kernel)  # Aplicar erosión
+        gradiente_erosion = cv.subtract(self.img, erosionada)  # Resta
+        return gradiente_erosion
+
+    # Gradiente Simétrico
+    def gradiente_simetrico(self):
+        kernel = np.array(
+            [
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1]
+            ], dtype=np.uint8)
+        
+        dilatada = cv.dilate(self.img, kernel)  # Dilatación
+        erosionada = cv.erode(self.img, kernel)  # Erosión
+        gradiente_simetrico = cv.subtract(dilatada, erosionada)  # Resta
+        return gradiente_simetrico
+    
+        
+
+        # Gradiente Simétrico
+        # gradiente_simetrico = imagen_dilatada - imagen_erosionada
     def dar_arreglo(self):
         #Para que podamos manipular la imagen tenemmos que cambiar a rgb
+        
         return self.img
 if __name__ == '__main__':
-    imagen = Imagen('img/b.jpg')
+    imagen = Imagen('img/gris_imagen.jpg')
     imagen_2 = Imagen('img/b.jpg')
     print(imagen.img)
     print("sdlfjsldf")
     operacion = Operacion(imagen,imagen_2)
-    o = operacion.filtro_mediana()
+    o = operacion.minimo_histograma()
     print(o)

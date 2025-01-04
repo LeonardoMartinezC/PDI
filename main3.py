@@ -229,6 +229,9 @@ class Editor:
         self.filtro_prewit_imagenes_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar Filtro Prewit", command=self.aplicar_filtro_prewit)
         self.filtro_prewit_imagenes_button.grid(row=1, column=0, pady=5, sticky="ew")
 
+        self.minimo_histograma_imagenes_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar minimo del histograma", command=self.aplicar_minimo_histograma)
+        self.minimo_histograma_imagenes_button.grid(row=6, column=0, pady=5, sticky="ew")
+
 
 
         # Botones para las operaciones de filtro y ruido-----------------
@@ -243,16 +246,91 @@ class Editor:
         self.label_ruido_sp = tk.Label(self.operaciones_filtro_frame, text="Valor de probabilidad:(0.05)")
         self.label_ruido_sp.grid(row=5, column=0, pady=5, sticky="w")
         self.entrada_ruido_sp = tk.Entry(self.operaciones_filtro_frame)
+        # Aplica ruido sal y pimienta a la imagen
         self.entrada_ruido_sp.grid(row=6, column=0, pady=5, sticky="ew")
         self.ruido_sp = tk.Button(self.operaciones_filtro_frame, text="Ruido sal y pimienta", command=self.aplicar_ruido_sp)
         self.ruido_sp.grid(row=7, column=0, pady=5, sticky="ew")
+
+        # Aplicas la Umbralizacion por minimo del histograma
+        self.minimo_histograma_imagenes_button = tk.Button(self.operaciones_filtro_frame, text="Aplicar minimo del histograma", command=self.aplicar_minimo_histograma)
+        self.minimo_histograma_imagenes_button.grid(row=8, column=0, pady=5, sticky="ew")
+
         self.operaciones_filtro_frame.grid(row=1, column=0, sticky="ew")
         
+
+
+
+        self.filtro_frame = tk.LabelFrame(button_frame, text="Segmentacion de Imagen", padx=10, pady=10,bg="#BECACE",fg="#000000")
+        self.filtro_frame.grid(row=4, column=0, sticky="ew", pady=5)
+        self.toggle_filtro_button = tk.Button(self.filtro_frame, text="Mostrar/Ocultar Segmentacipon", command=self.toggle_segmentacion,bg="#BBBFBF",fg="#000000")
+        self.toggle_carga_button['font'] = f = font.Font(size=10)
+        self.toggle_filtro_button.grid(row=0, column=0, pady=5, sticky="ew")
+        # Marco para las operaciones de filtro aqui ocultas
+        self.operaciones_segmentacion_frame = tk.Frame(self.filtro_frame,bg="#BECACE")
+        self.segmentacion_imagenes_button = tk.Button(self.operaciones_segmentacion_frame, text="Aplicar Segmentacion a Imagen", command=self.aplicar_segmentacion)
+        self.segmentacion_imagenes_button.grid(row=0, column=0, pady=5, sticky="ew")
+        self.operaciones_filtro_frame.grid(row=1, column=0, sticky="ew")
+
+
+        # self.morfologia_frame = tk.LabelFrame(button_frame, text="M de Imagen", padx=10, pady=10,bg="#BECACE",fg="#000000")
+        # self.morfologia_frame.grid(row=5, column=0, sticky="ew", pady=5)
+        # self.toggle_morfologia_button = tk.Button(self.morfologia_frame, text="Mostrar/Ocultar M-D", command=self.toggle_morfologia,bg="#BBBFBF",fg="#000000")
+        # self.toggle_carga_button['font'] = f = font.Font(size=10)
+        # self.toggle_morfologia_button.grid(row=0, column=0, pady=5, sticky="ew")
+        # # Marco para las operaciones de filtro aqui ocultas
+        # self.operaciones_morfologia_frame = tk.Frame(self.morfologia_frame,bg="#BECACE")
+
+        # # Se aplica la dilatacion a una imagen binaria
+        # self.dilatacion_imagenes_button = tk.Button(self.operaciones_morfologia_frame, text="Aplicar Dilatacion", command=self.aplicar_dilatacion)
+        # self.dilatacion_imagenes_button.grid(row=0, column=0, pady=5, sticky="ew")
+    
+        # self.erosion_imagenes_button = tk.Button(self.operaciones_morfologia_frame, text="Aplicar Erosion", command=self.aplicar_erosion)
+        # self.erosion_imagenes_button.grid(row=1, column=0, pady=5, sticky="ew")
+        
+        # self.apertura_imagenes_button = tk.Button(self.operaciones_morfologia_frame, text="Aplicar Apertura", command=self.aplicar_apertura)
+        # self.apertura_imagenes_button.grid(row=2, column=0, pady=5, sticky="ew")
+        
+        # self.cierre_imagenes_button = tk.Button(self.operaciones_morfologia_frame, text="Aplicar Cierre", command=self.aplicar_cierre)
+        # self.cierre_imagenes_button.grid(row=3, column=0, pady=5, sticky="ew")
+
+        # self.tophat_imagenes_button = tk.Button(self.operaciones_morfologia_frame, text="Aplicar top-hat", command=self.aplicar_tophat)
+        # self.tophat_imagenes_button.grid(row=4, column=0, pady=5, sticky="ew")
+
+        # self.bothat_imagenes_button = tk.Button(self.operaciones_morfologia_frame, text="Aplicar bot-hat", command=self.aplicar_bothat)
+        # self.bothat_imagenes_button.grid(row=5, column=0, pady=5, sticky="ew")
+
+            
+        # self.operaciones_morfologia_frame.grid(row=1, column=0, sticky="ew")
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         # Inicialización de Imágenes
         self.original_image = None
         self.original_image_2 = None
         self.processed_image = None
+    # def toggle_morfologia(self):
+    #     # Mostrar u ocultar el marco de carga oculta
+    #     if self.operaciones_morfologia_frame.winfo_ismapped():
+    #         self.operaciones_morfologia_frame.grid_remove()
+    #     else:
+    #         self.operaciones_morfologia_frame.grid()
+    def toggle_segmentacion(self):
+        # Mostrar u ocultar el marco de carga oculta
+        if self.operaciones_segmentacion_frame.winfo_ismapped():
+            self.operaciones_segmentacion_frame.grid_remove()
+        else:
+            self.operaciones_segmentacion_frame.grid()
     def toggle_filtro(self):
         # Mostrar u ocultar el marco de carga oculta
         if self.operaciones_filtro_frame.winfo_ismapped():
@@ -281,6 +359,7 @@ class Editor:
         else:
             self.operaciones_logicas_frame.grid()
 
+    
 
 
 
@@ -292,7 +371,7 @@ class Editor:
         if file_path:
             self.imagen2 = eu.Imagen(file_path)
             self.original_image_2 = self.imagen2
-            self.display_image(self.imagen2,self.image_label2)
+            self.display_image(self.imagen2.dar_arreglo(),self.image_label2)
 
     def cargar_imagen(self):
         # Abrir un archivo de imagen
@@ -302,10 +381,10 @@ class Editor:
             self.imagen1 = eu.Imagen(file_path)
             self.original_image = self.imagen1
             print(self.imagen1)
-            self.display_image(self.imagen1,self.image_label1)
+            self.display_image(self.imagen1.dar_arreglo(),self.image_label1)
     def display_image(self, img, label):
         # Verificar si la imagen está en formato BGR y convertirla a RGB
-        imagen = img.dar_arreglo()
+        imagen = img
         tam = imagen.shape
         
         # Convertir BGR a RGB si es necesario
@@ -330,14 +409,19 @@ class Editor:
         # Actualizar la etiqueta de imagen
         label.configure(image=img_tk)
         label.image = img_tk  # Mantener una referencia a la imagen para evitar que se recoja
+        
 
+        # image_rgb = cv.cvtColor(image_cv, cv.COLOR_BGR2RGB)
+        # image_pil = Image.fromarray(image_rgb)
+        # self.current_image = ImageTk.PhotoImage(image_pil)
+        # self.image_label1.config(image=self.current_image)
 
 
     def aplicar_expansion(self):
         if self.original_image is not None:
             try:
                 maximo_input = self.entrada_expancion.get()                
-                expancion_image = eu.Operacion(self.original_image)
+                expancion_image = eu.Operacion(self.original_image.dar_arreglo())
                 # Comprobar si maximo_input está vacío y manejarlo adecuadamente
                 if maximo_input:  # Si hay un valor ingresado
                     maximo = tuple(map(int, maximo_input.split(',')))  # Convertir a tupla de enteros
@@ -347,7 +431,7 @@ class Editor:
                 
                 img_cargada = guardar_imagen(expancion_image, 'Expansion')
                 
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             except ValueError:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
         else:
@@ -360,7 +444,7 @@ class Editor:
                 maximo_input = self.entrada_contraccion.get()
                 print(maximo_input)
                 
-                contraccion_image = eu.Operacion(self.original_image)
+                contraccion_image = eu.Operacion(self.original_image.dar_arreglo())
                 
                 # Comprobar si maximo_input está vacío y manejarlo adecuadamente
                 if maximo_input:  # Si hay un valor ingresado
@@ -370,7 +454,7 @@ class Editor:
                     contraccion_image = contraccion_image.operacion_contraccion_color()  # Llama sin argumentos
                 #Devolver objeto Imagen() para pasarlo a display_imgage
                 img_cargada = guardar_imagen(contraccion_image, 'Contraccion')
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             except ValueError:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
         else:
@@ -382,7 +466,7 @@ class Editor:
                 maximo_input = self.entrada_ruido_gaussiano.get()
                 print(maximo_input)
                 
-                ruido_gaussiano_image = eu.Operacion(self.original_image)
+                ruido_gaussiano_image = eu.Operacion(self.original_image.dar_arreglo())
                 
                 # Comprobar si maximo_input está vacío y manejarlo adecuadamente
                 if maximo_input:  # Si hay un valor ingresado
@@ -392,7 +476,7 @@ class Editor:
                     ruido_gaussiano_image = ruido_gaussiano_image.ruido_gaussiano()  # Llama sin argumentos
                 #Devolver objeto Imagen() para pasarlo a display_imgage
                 img_cargada = guardar_imagen(ruido_gaussiano_image, 'ruido_gaussiano')
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             except ValueError:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
         else:
@@ -403,14 +487,13 @@ class Editor:
                 try:
                     #Necesitamos tomar un valor de desplazamiento que se define en la interfaz
                     ruido = self.entrada_ruido_sp.get() # Obtener valor de desplazamiento
-                    print(ruido)
-                    ruidoSP = eu.Operacion(self.original_image)
+                    ruidoSP = eu.Operacion(self.original_image.dar_arreglo())
                     if ruido:
-                        ruidoSP = ruidoSP.ruidoSP(int(ruido))  # Usar el valor
+                        ruidoSP = ruidoSP.ruidoSP(float(ruido))  # Usar el valor
                     else:
                         ruidoSP = ruidoSP.ruidoSP()
                     img_cargada = guardar_imagen(ruidoSP, 'ruido_sal_pimienta')
-                    self.display_image(img_cargada,self.image_label3)
+                    self.display_image(img_cargada.dar_arreglo(),self.image_label3)
                 except ValueError:
                     messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
             else:
@@ -422,13 +505,13 @@ class Editor:
             try:
                 #Necesitamos tomar un valor de desplazamiento que se define en la interfaz
                 valor_desplazamiento = self.entrada_desplazamiento.get()  # Obtener valor de desplazamiento
-                desplazamiento_image = eu.Operacion(self.original_image)
+                desplazamiento_image = eu.Operacion(self.original_image.dar_arreglo())
                 if valor_desplazamiento:
                     desplazamiento_image = desplazamiento_image.desplazamiento(int(valor_desplazamiento))
                 else:
                     desplazamiento_image = desplazamiento_image.desplazamiento()  # Usar el valor
                 img_cargada = guardar_imagen(desplazamiento_image, 'Desplazamiento')
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             except ValueError:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
         else:
@@ -439,13 +522,13 @@ class Editor:
             try:
                 #Necesitamos tomar un valor de desplazamiento que se define en la interfaz
                 suma_resta = self.entrada_suma.get()  # Obtener valor de desplazamiento
-                suma_imagen = eu.Operacion(self.original_image)
+                suma_imagen = eu.Operacion(self.original_image.dar_arreglo())
                 if suma_resta:
                     suma_imagen = suma_imagen.suma_escalar(int(suma_resta))  # Usar el valor
                 else:
                     suma_imagen = suma_imagen.suma_escalar()
                 img_cargada = guardar_imagen(suma_imagen, 'Suma_escalar')
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             except ValueError:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
         else:
@@ -456,13 +539,13 @@ class Editor:
                 #Necesitamos tomar un valor de desplazamiento que se define en la interfaz
                 umbral = self.entrada_umbralizado.get() # Obtener valor de desplazamiento
                 print(umbral)
-                umbralizado = eu.Operacion(self.original_image)
+                umbralizado = eu.Operacion(self.original_image.dar_arreglo())
                 if umbral:
                     umbralizado = umbralizado.operacion_umbralizado(int(umbral))  # Usar el valor
                 else:
                     umbralizado = umbralizado.operacion_umbralizado()
                 img_cargada = guardar_imagen(umbralizado, 'umbralizado')
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             except ValueError:
                 messagebox.showerror("Error", "Introduce un número válido para el desplazamiento")
         else:
@@ -471,26 +554,26 @@ class Editor:
     def aplicar_EU(self):
         if self.original_image is not None:
             #Llamamos a la clase Operacion
-            ecualizacion_uni_image = eu.Operacion(self.original_image)
+            ecualizacion_uni_image = eu.Operacion(self.original_image.dar_arreglo())
             #Llamamos a la operacion ecualizacion Uniforme
             ecualizacion_uni_image = ecualizacion_uni_image.ecualizacion_Uniforme_color()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(ecualizacion_uni_image,'Ecualizacion_Uni')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
     
     def aplicar_operacion_or(self):
         if self.original_image is not None and self.original_image_2 is not None :
             #Llamamos a la clase Operacion
-            operacion_or = eu.Operacion(self.original_image, self.original_image_2)
+            operacion_or = eu.Operacion(self.original_image.dar_arreglo(), self.original_image_2.dar_arreglo())
             #Llamamos a la operacion OR
             operacion_or = operacion_or.operacion_or()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(operacion_or,'Operacion_OR')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
 
@@ -498,26 +581,26 @@ class Editor:
         #Deben haber dos imagenes cargadas para que puedas realizar la operacion 
         if self.original_image is not None and self.original_image_2 is not None:
             #Llamamos a la clase Operacion
-            operacion_and = eu.Operacion(self.original_image, self.original_image_2)
+            operacion_and = eu.Operacion(self.original_image.dar_arreglo(), self.original_image_2.dar_arreglo())
             #Llamamos a la operacion AND
             operacion_and = operacion_and.operacion_and()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(operacion_and,'Operacion_AND')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
         
     def aplicar_operacion_xor(self):
         if self.original_image is not None and self.original_image_2 is not None:
             #Llamamos a la clase Operacion
-            operacion_xor = eu.Operacion(self.original_image, self.original_image_2)
+            operacion_xor = eu.Operacion(self.original_image.dar_arreglo(), self.original_image_2.dar_arreglo())
             #Llamamos a la operacion XOR
             operacion_xor = operacion_xor.operacion_xor()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(operacion_xor,'Operacion_XOR')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
 
@@ -525,70 +608,70 @@ class Editor:
     def aplicar_suma_dos_imagenes(self):
         if self.original_image is not None and self.original_image_2 is not None :
             #Llamamos a la clase Operacion
-            suma_dos_img = eu.Operacion(self.original_image, self.original_image_2)
+            suma_dos_img = eu.Operacion(self.original_image.dar_arreglo(), self.original_image_2.dar_arreglo())
             #Llamamos a la operacion SUMA
             suma_dos_img = suma_dos_img.suma_dos_img()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(suma_dos_img,'suma_dos_img')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
     def aplicar_resta_dos_imagenes(self):
         if self.original_image is not None and self.original_image_2 is not None :
             #Llamamos a la clase Operacion
-            resta_dos_img = eu.Operacion(self.original_image, self.original_image_2)
+            resta_dos_img = eu.Operacion(self.original_image.dar_arreglo(), self.original_image_2.dar_arreglo())
             #Llamamos a la operacion RESTA
             resta_dos_img = resta_dos_img.resta_dos_img()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(resta_dos_img,'resta_dos_img')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
         
     def aplicar_mul_dos_imagenes(self):
         if self.original_image is not None and self.original_image_2 is not None :
             #Llamamos a la clase Operacion
-            mul_dos_img = eu.Operacion(self.original_image, self.original_image_2)
+            mul_dos_img = eu.Operacion(self.original_image.dar_arreglo(), self.original_image_2.dar_arreglo())
             #Llamamos a la operacion MULTIPLICACION
             mul_dos_img = mul_dos_img.mul_dos_img()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(mul_dos_img,'mul_dos_img')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
         #-------------------------------------------------------------------------------------------------------
     def aplicar_gris(self):
         if self.original_image is not None:
             #Llamamos a la clase Operacion
-            mul_dos_img = eu.Operacion(self.original_image)
+            mul_dos_img = eu.Operacion(self.original_image.dar_arreglo())
             #Llamamos a la operacion MULTIPLICACION
             mul_dos_img = mul_dos_img.operacion_gris()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(mul_dos_img,'gris_imagen')
             
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
     def aplicar_inverso(self):
         if self.original_image is not None:
             #Llamamos a la clase Operacion
-            mul_dos_img = eu.Operacion(self.original_image)
+            mul_dos_img = eu.Operacion(self.original_image.dar_arreglo())
             #Llamamos a la operacion INVERSO
             mul_dos_img = mul_dos_img.operacion_inverso()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
             img_cargada = guardar_imagen(mul_dos_img,'inverso_imagen')
         
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
 
     def aplicar_extraccion_canales(self):
         if self.original_image is not None:
             #Llamamos a la clase Operacion
-            mul_dos_img = eu.Operacion(self.original_image)
+            mul_dos_img = eu.Operacion(self.original_image.dar_arreglo())
             #Llamamos a la operacion INVERSO
             b,g,r = mul_dos_img.extraccion_canales()
             #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
@@ -597,7 +680,7 @@ class Editor:
             img_cargada = guardar_imagen(g,'g')
             img_cargada = guardar_imagen(r,'r')
         
-            self.display_image(img_cargada,self.image_label3)
+            self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             messagebox.showerror("AVISO", "Solo esta mostrando el canal rojo pero todas fueron guardadas")
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
@@ -606,7 +689,7 @@ class Editor:
         if self.original_image is not None:
             print(self.original_image)
             # Crear el histograma
-            histograma = eu.Operacion(self.original_image)
+            histograma = eu.Operacion(self.original_image.dar_arreglo())
             histograma = histograma.hacer_histograma_colores('histograma')
             print(histograma)
                         
@@ -614,7 +697,7 @@ class Editor:
             if(histograma !=None):
                 img_cargada = eu.Imagen(histograma)
                 # Asegúrate de que estás usando un Label específico para el histograma
-                self.display_image(img_cargada, self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(), self.image_label3)
         
         else:
             messagebox.showerror("Error", "Cargar una imagen primero")
@@ -622,26 +705,292 @@ class Editor:
     def aplicar_filtro_mediana(self):
             if self.original_image is not None:
                 #Llamamos a la clase Operacion
-                f_mediana = eu.Operacion(self.original_image)
+                f_mediana = eu.Operacion(self.original_image.dar_arreglo())
                 #Llamamos a la operacion INVERSO
                 f_mediana = f_mediana.filtro_mediana()
                 #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
                 img_cargada = guardar_imagen(f_mediana,'filtro_mediana')
             
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             else:
                 messagebox.showerror("Error", "Cargar una imagen primero")
 
     def aplicar_filtro_prewit(self):
             if self.original_image is not None:
                 #Llamamos a la clase Operacion
-                f_prewitt = eu.Operacion(self.original_image)
+                f_prewitt = eu.Operacion(self.original_image.dar_arreglo())
                 #Llamamos a la operacion INVERSO
                 f_prewitt = f_prewitt.filtro_prewitt()
                 #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
                 img_cargada = guardar_imagen(f_prewitt,'filtro_prewitt')
             
-                self.display_image(img_cargada,self.image_label3)
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+
+    def aplicar_minimo_histograma(self):
+        if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                m_histograma= eu.Operacion(self.original_image.dar_arreglo())
+                #Llamamos a la operacion INVERSO
+                m_histograma = m_histograma.minimo_histograma()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(m_histograma,'minimo_histograma')
+            
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
+        else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+
+    def aplicar_segmentacion(self):
+        if self.original_image is not None:
+                #Llamamos a la clase Operacion
+            m_histograma = eu.Operacion(self.original_image.dar_arreglo())
+            imagen_original = m_histograma.operacion_gris()
+            # Paso 1: Convertir a escala de grises
+            imagen = m_histograma.operacion_gris()
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'imagen_gris_1')
+
+            # Paso 2: Aplicar filtro promedio varias veces
+            for i in range(0, 4):
+                operacion = eu.Operacion(imagen)
+                imagen = operacion.filtro_promedio()
+                print(f"Filtro promedio iteración {i+1}: {imagen.shape}")  # Depuración
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'filtro_promedio_2')
+
+
+            # Paso 3: Aplicar filtro mínimo varias veces
+            for i in range(0, 3):
+                operacion = eu.Operacion(imagen)
+                imagen = operacion.filtro_minimo()
+                print(f"Filtro mínimo iteración {i+1}: {imagen.shape}")  # Depuración
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'filtro_minimo_3')
+
+            # Paso 4: Aplicar filtro mediana varias veces
+            for i in range(0, 20):
+                operacion = eu.Operacion(imagen)
+                imagen = operacion.filtro_mediana()
+                print(f"Filtro mediana iteración {i+1}: {imagen.shape}")  # Depuración
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'filtro_mediana_4')
+
+
+            # Paso 5: Reaplicar filtro promedio
+            for i in range(0, 3):
+                operacion = eu.Operacion(imagen)
+                imagen = operacion.filtro_promedio()
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'filtro_promedio_6')
+
+
+            # Paso 6: Umbralizado
+            operacion = eu.Operacion(imagen)
+            imagen = operacion.operacion_umbralizado(71)
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'umbralizado_7')
+
+
+            # Paso 7: Filtros adicionales (máximo y mediana)
+            for i in range(0, 3):
+                operacion = eu.Operacion(imagen)
+                imagen = operacion.filtro_maximo()
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'filtro_maxiomo_8')
+
+            for i in range(0, 13):
+                operacion = eu.Operacion(imagen)
+                imagen = operacion.filtro_mediana()
+            self.display_image(imagen, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen,'filtro_mediana_9')
+
+
+            # Paso 8: Filtro mínimo final
+            for i in range(0, 1):
+                operacion = eu.Operacion(imagen)
+                imagen = operacion.filtro_minimo()
+
+            self.display_image(imagen, self.image_label3)
+            img_cargada = guardar_imagen(imagen,'filtro_minimo_10')
+
+
+
+
+            imagen_r = eu.Operacion(self.original_image.dar_arreglo())
+            _,_,imagen_r = imagen_r.extraccion_canales()
+            self.display_image(imagen_r, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_r,'canal_rojo_11')
+
+            operacion = eu.Operacion(imagen_r)
+            imagen_gris = operacion.operacion_gris()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'operacion_gris_12')
+
+
+            for i in range(0, 3):
+                operacion = eu.Operacion(imagen_gris)
+                imagen_gris = operacion.filtro_maximo()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'filtro_maximo_13')
+
+
+            for i in range(0, 20):
+                operacion = eu.Operacion(imagen_gris)
+                imagen_gris = operacion.filtro_mediana()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'filtro_mediana_14')
+
+
+            operacion = eu.Operacion(imagen_gris)
+            imagen_gris = operacion.operacion_umbralizado(12)
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'umbralizado_15')
+            
+            operacion = eu.Operacion(imagen_gris)
+            imagen_gris = operacion.operacion_inverso()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'inverso_16')
+
+            # imagen_gris = cv.imread("placa/filtro_maximo_17.jpg")
+            # # imagen_gris = cv.cvtColor(imagen_gris,cv.COLOR_BGR2GRAY)
+            for i in range(0, 38):
+                operacion = eu.Operacion(imagen_gris)
+                imagen_gris = operacion.filtro_maximo()
+            self.display_image(imagen_gris, self.image_label3) 
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'filtro_maximo_17')
+
+
+            operacion = eu.Operacion(imagen,imagen_gris)
+            imagen_gris = operacion.operacion_or()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'operacion_or_18')
+
+            for i in range(0, 6):
+                operacion = eu.Operacion(imagen_gris)
+                imagen_gris = operacion.filtro_mediana()
+            
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'operacion_mediana_19')
+
+            operacion = eu.Operacion(imagen_gris)
+            imagen_gris = operacion.operacion_inverso()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            img_cargada = guardar_imagen(imagen_gris,'umbralizado_total')
+
+            operacion = eu.Operacion(imagen_gris)
+            imagen_gris = operacion.filtro_prewitt()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            
+            img_cargada = guardar_imagen(imagen_gris,'umbralizado_total_prewitt')
+
+
+            operacion = eu.Operacion(imagen_original,imagen_gris)
+            imagen_gris = operacion.operacion_or()
+            self.display_image(imagen_gris, self.image_label3)
+            self.root.update()
+            
+            img_cargada = guardar_imagen(imagen_gris,'umbralizado_total_or')
+
+            
+
+        else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+
+
+
+
+
+    def aplicar_dilatacion(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                f_dilatacion = eu.Operacion(self.original_image.dar_arreglo())
+                #Llamamos a la operacion INVERSO
+                f_dilatacion = f_dilatacion.operacion_dilatacion()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(f_dilatacion,'dilatacion')
+            
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+    def aplicar_erosion(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                f_erosion = eu.Operacion(self.original_image.dar_arreglo())
+                #Llamamos a la operacion INVERSO
+                f_erosion = f_erosion.operacion_erosion()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(f_erosion,'erosion')
+            
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+    def aplicar_apertura(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                apertura = eu.Operacion(self.original_image.dar_arreglo())
+                #Llamamos a la operacion INVERSO
+                apertura = apertura.operacion_apertura()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(apertura,'apertura')
+            
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+    def aplicar_cierre(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                cierre = eu.Operacion(self.original_image.dar_arreglo())
+                #Llamamos a la operacion INVERSO
+                cierre = cierre.operacion_cierre()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(cierre,'cierre')
+            
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+
+    def aplicar_tophat(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                cierre = eu.Operacion(self.original_image.dar_arreglo())
+                #Llamamos a la operacion INVERSO
+                cierre = cierre.tophat()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(cierre,'tophat')
+            
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
+            else:
+                messagebox.showerror("Error", "Cargar una imagen primero")
+    def aplicar_bothat(self):
+            if self.original_image is not None:
+                #Llamamos a la clase Operacion
+                cierre = eu.Operacion(self.original_image.dar_arreglo())
+                #Llamamos a la operacion INVERSO
+                cierre = cierre.bothat()
+                #Guardamos el objeto Imagen en "img_cargada" para darsela a display_image
+                img_cargada = guardar_imagen(cierre,'bothat')
+            
+                self.display_image(img_cargada.dar_arreglo(),self.image_label3)
             else:
                 messagebox.showerror("Error", "Cargar una imagen primero")
 # ------------------------------------------------------
